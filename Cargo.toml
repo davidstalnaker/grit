@@ -1,0 +1,7 @@
+[package]
+name = "grit"
+version = "0.0.1"
+authors = ["David Stalnaker <david.stalnaker@gmail.com>"]
+
+[dependencies]
+clap = "0.5.10"
