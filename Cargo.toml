@@ -5,3 +5,4 @@ authors = ["David Stalnaker <david.stalnaker@gmail.com>"]
 
 [dependencies]
 clap = "0.5.10"
+sha1 = "0.1.0"
