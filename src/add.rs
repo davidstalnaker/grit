@@ -35,9 +35,9 @@ impl Index {
         self.hashes.push((path.to_string(), hash.to_string()));
     }
 
-    fn print(self) {
-        for (path, hash) in self.hashes {
-            println!("{}, {}", path, hash);
+    fn print(&self) {
+        for &(ref hash, ref path) in &self.hashes {
+            println!("{}, {}", hash, path);
         }
     }
 }
