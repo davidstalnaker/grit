@@ -6,15 +6,43 @@ use std::fs::File;
 use std::path::Path;
 
 pub fn add_all(to_add: &Vec<&str>) {
+    let mut index = Index::new();
     for filename in to_add {
         match add(filename) {
-            Ok(()) => println!("Added {}.", filename),
+            Ok(hash) => {
+                println!("Added {}.", filename);
+                index.update(filename, &hash);
+            },
             Err(e) => println!("Error: {}", e)
+        }
+    }
+    index.print();
+    //index.write();
+}
+
+struct Index {
+    hashes: Vec<(String, String)>
+}
+
+impl Index {
+    fn new() -> Index {
+        Index {
+            hashes: Vec::new()
+        }
+    }
+
+    fn update(&mut self, path: &str, hash: &str) {
+        self.hashes.push((path.to_string(), hash.to_string()));
+    }
+
+    fn print(self) {
+        for (path, hash) in self.hashes {
+            println!("{}, {}", path, hash);
         }
     }
 }
 
-pub fn add(to_add: &str) -> io::Result<()> {
+pub fn add(to_add: &str) -> io::Result<String> {
     let path = Path::new(to_add);
     let mut f = try!(File::open(path));
     let mut bytes = Vec::new();
@@ -35,5 +63,5 @@ pub fn add(to_add: &str) -> io::Result<()> {
         try!(blob_f.write_all(&bytes[..]));
     }
 
-    return Ok(());
+    return Ok(hash);
 }
