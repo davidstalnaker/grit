@@ -8,7 +8,7 @@ use std::path::Path;
 pub fn add_all(to_add: &Vec<&str>) {
     let mut index = Index::new();
     for filename in to_add {
-        match add(filename) {
+        match write_blob(filename) {
             Ok(hash) => {
                 println!("Added {}.", filename);
                 index.update(filename, &hash);
@@ -16,8 +16,7 @@ pub fn add_all(to_add: &Vec<&str>) {
             Err(e) => println!("Error: {}", e)
         }
     }
-    index.print();
-    //index.write();
+    index.write();
 }
 
 struct Index {
@@ -40,9 +39,20 @@ impl Index {
             println!("{}, {}", hash, path);
         }
     }
+
+    fn write(&self) -> io::Result<()> {
+        let grit_dir = Path::new(".grit");
+        let mut index = try!(File::create(grit_dir.join("index")));
+
+        for &(ref hash, ref path) in &self.hashes {
+            writeln!(&mut index, "{}, {}", hash, path);
+        }
+
+        return Ok(());
+    }
 }
 
-pub fn add(to_add: &str) -> io::Result<String> {
+pub fn write_blob(to_add: &str) -> io::Result<String> {
     let path = Path::new(to_add);
     let mut f = try!(File::open(path));
     let mut bytes = Vec::new();
