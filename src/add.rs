@@ -5,6 +5,15 @@ use std::io::{Read, Write};
 use std::fs::File;
 use std::path::Path;
 
+pub fn add_all(to_add: &Vec<&str>) {
+    for filename in to_add {
+        match add(filename) {
+            Ok(()) => println!("Added {}.", filename),
+            Err(e) => println!("Error: {}", e)
+        }
+    }
+}
+
 pub fn add(to_add: &str) -> io::Result<()> {
     let path = Path::new(to_add);
     let mut f = try!(File::open(path));
