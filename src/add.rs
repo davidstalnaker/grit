@@ -1,6 +1,7 @@
 extern crate sha1;
 
 use std::{io, fs};
+use std::collections::HashMap;
 use std::io::{BufReader, BufRead, Read, Write};
 use std::fs::File;
 use std::path::{Path, PathBuf};
@@ -18,14 +19,14 @@ pub fn add_all(to_add: &Vec<&str>) -> io::Result<()> {
 
 pub struct Index {
     path: Box<PathBuf>,
-    hashes: Vec<(String, String)>
+    hashes: HashMap<String, String>
 }
 
 impl Index {
     pub fn new() -> io::Result<Index> {
         let mut index = Index {
             path: Box::new(Path::new(".grit").join("index")),
-            hashes: Vec::new()
+            hashes: HashMap::new()
         };
         if !path_exists(&*index.path) {
             return Ok(index);
@@ -44,18 +45,18 @@ impl Index {
     }
 
     pub fn update(&mut self, path: &str, hash: &str) {
-        self.hashes.push((path.to_string(), hash.to_string()));
+        self.hashes.insert(path.to_string(), hash.to_string());
     }
 
     pub fn print(&self) {
-        for &(ref hash, ref path) in &self.hashes {
+        for (ref hash, ref path) in self.hashes.iter() {
             println!("{}, {}", hash, path);
         }
     }
 
     pub fn write(&self) -> io::Result<()> {
         let mut index = try!(File::create(&*self.path));
-        for &(ref hash, ref path) in &self.hashes {
+        for (ref hash, ref path) in self.hashes.iter() {
             try!(writeln!(&mut index, "{} {}", hash, path));
         }
         Ok(())
