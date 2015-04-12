@@ -1,12 +1,12 @@
 extern crate sha1;
 
 use std::{io, fs};
-use std::io::{Read, Write};
+use std::io::{BufReader, BufRead, Read, Write};
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
 pub fn add_all(to_add: &Vec<&str>) -> io::Result<()> {
-    let mut index = Index::new();
+    let mut index = try!(Index::new());
     for filename in to_add {
         match write_blob(filename) {
             Ok(hash) => {
@@ -25,11 +25,25 @@ struct Index {
 }
 
 impl Index {
-    fn new() -> Index {
-        Index {
+    fn new() -> io::Result<Index> {
+        let mut index = Index {
             path: Box::new(Path::new(".grit").join("index")),
             hashes: Vec::new()
+        };
+        if !path_exists(&*index.path) {
+            return Ok(index);
         }
+        let mut file = BufReader::new( try!(File::open(&*index.path)) );
+        for line in file.lines() {
+            match line {
+                Ok( l ) => {
+                    let blob : Vec<&str> = l.split(' ').collect();
+                    index.update(blob[0], blob[1]);
+                },
+                Err(e) => println!("Error: {}",e)
+            }
+        }
+        Ok(index)
     }
 
     fn update(&mut self, path: &str, hash: &str) {
@@ -45,11 +59,16 @@ impl Index {
     fn write(&self) -> io::Result<()> {
         let mut index = try!(File::create(&*self.path));
         for &(ref hash, ref path) in &self.hashes {
-            writeln!(&mut index, "{}, {}", hash, path);
+            writeln!(&mut index, "{} {}", hash, path);
         }
 
         return Ok(());
     }
+
+}
+
+fn path_exists(path : &PathBuf) -> bool {
+    fs::metadata(path).is_ok()
 }
 
 pub fn write_blob(to_add: &str) -> io::Result<String> {
@@ -64,11 +83,11 @@ pub fn write_blob(to_add: &str) -> io::Result<String> {
 
     let objects = Path::new(".grit/objects");
     let blob_dir = objects.join(&hash[..2]);
-    if !fs::metadata(&blob_dir).is_ok() {
+    if !path_exists(&blob_dir) {
         try!(fs::create_dir(&blob_dir));
     }
     let blob = blob_dir.join(&hash[2..]);
-    if !fs::metadata(&blob).is_ok() {
+    if !path_exists(&blob) {
         let mut blob_f = try!(File::create(&blob));
         try!(blob_f.write_all(&bytes[..]));
     }
