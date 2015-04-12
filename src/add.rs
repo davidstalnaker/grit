@@ -3,9 +3,9 @@ extern crate sha1;
 use std::{io, fs};
 use std::io::{Read, Write};
 use std::fs::File;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-pub fn add_all(to_add: &Vec<&str>) {
+pub fn add_all(to_add: &Vec<&str>) -> io::Result<()> {
     let mut index = Index::new();
     for filename in to_add {
         match write_blob(filename) {
@@ -16,16 +16,18 @@ pub fn add_all(to_add: &Vec<&str>) {
             Err(e) => println!("Error: {}", e)
         }
     }
-    index.write();
+    index.write()
 }
 
 struct Index {
+    path : Box<PathBuf>,
     hashes: Vec<(String, String)>
 }
 
 impl Index {
     fn new() -> Index {
         Index {
+            path: Box::new(Path::new(".grit").join("index")),
             hashes: Vec::new()
         }
     }
@@ -41,9 +43,7 @@ impl Index {
     }
 
     fn write(&self) -> io::Result<()> {
-        let grit_dir = Path::new(".grit");
-        let mut index = try!(File::create(grit_dir.join("index")));
-
+        let mut index = try!(File::create(&*self.path));
         for &(ref hash, ref path) in &self.hashes {
             writeln!(&mut index, "{}, {}", hash, path);
         }
