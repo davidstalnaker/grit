@@ -24,7 +24,10 @@ fn main() {
     }
 
     if let Some(submatches) = matches.subcommand_matches("add") {
-        grit::add_all(&submatches.values_of("file").unwrap());
+        match grit::add_all(&submatches.values_of("file").unwrap()) {
+            Ok(()) => (),
+            Err(e) => println!("Error: {}", e)
+        }
     }
 }
 

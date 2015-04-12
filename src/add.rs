@@ -9,23 +9,20 @@ pub fn add_all(to_add: &Vec<&str>) -> io::Result<()> {
     let mut index = try!(Index::new());
     for filename in to_add {
         match write_blob(filename) {
-            Ok(hash) => {
-                println!("Added {}.", filename);
-                index.update(filename, &hash);
-            },
-            Err(e) => println!("Error: {}", e)
+            Ok(hash) => index.update(filename, &hash),
+            Err(e) => return Err(e)
         }
     }
     index.write()
 }
 
-struct Index {
-    path : Box<PathBuf>,
+pub struct Index {
+    path: Box<PathBuf>,
     hashes: Vec<(String, String)>
 }
 
 impl Index {
-    fn new() -> io::Result<Index> {
+    pub fn new() -> io::Result<Index> {
         let mut index = Index {
             path: Box::new(Path::new(".grit").join("index")),
             hashes: Vec::new()
@@ -33,7 +30,7 @@ impl Index {
         if !path_exists(&*index.path) {
             return Ok(index);
         }
-        let mut file = BufReader::new( try!(File::open(&*index.path)) );
+        let file = BufReader::new( try!(File::open(&*index.path)) );
         for line in file.lines() {
             match line {
                 Ok( l ) => {
@@ -46,25 +43,23 @@ impl Index {
         Ok(index)
     }
 
-    fn update(&mut self, path: &str, hash: &str) {
+    pub fn update(&mut self, path: &str, hash: &str) {
         self.hashes.push((path.to_string(), hash.to_string()));
     }
 
-    fn print(&self) {
+    pub fn print(&self) {
         for &(ref hash, ref path) in &self.hashes {
             println!("{}, {}", hash, path);
         }
     }
 
-    fn write(&self) -> io::Result<()> {
+    pub fn write(&self) -> io::Result<()> {
         let mut index = try!(File::create(&*self.path));
         for &(ref hash, ref path) in &self.hashes {
-            writeln!(&mut index, "{} {}", hash, path);
+            try!(writeln!(&mut index, "{} {}", hash, path));
         }
-
-        return Ok(());
+        Ok(())
     }
-
 }
 
 fn path_exists(path : &PathBuf) -> bool {
@@ -92,5 +87,5 @@ pub fn write_blob(to_add: &str) -> io::Result<String> {
         try!(blob_f.write_all(&bytes[..]));
     }
 
-    return Ok(hash);
+    Ok(hash)
 }
