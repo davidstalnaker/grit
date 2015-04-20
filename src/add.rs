@@ -4,8 +4,9 @@ use std::{io, fs};
 use std::collections::HashMap;
 use std::io::{BufReader, BufRead, Read, Write};
 use std::fs::File;
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 use std::env;
+use utils::{relative_from, path_exists};
 
 pub fn add_all(root_dir: &PathBuf, to_add: &Vec<&str>) -> io::Result<()> {
     let mut index = try!(Index::new(&root_dir));
@@ -20,27 +21,6 @@ pub fn add_all(root_dir: &PathBuf, to_add: &Vec<&str>) -> io::Result<()> {
         }
     }
     index.write()
-}
-
-fn relative_from<'a, P: Sized + AsRef<Path>>(abs: &'a P, root: &'a P) -> Option<&'a Path> {
-    // See Path.relative_from(*) which is currently unstable.
-    iter_after(abs.as_ref().components(), root.as_ref().components()).map(|c| c.as_path())
-}
-fn iter_after<A, I, J>(mut iter: I, mut prefix: J) -> Option<I> where
-    I: Iterator<Item=A> + Clone, J: Iterator<Item=A>, A: PartialEq 
-{
-    loop {
-        let mut iter_next = iter.clone();
-        match (iter_next.next(), prefix.next()) {
-            (Some(x), Some(y)) => {
-                if x != y { return None }
-            },
-            (Some(_), None) => return Some(iter),
-            (None, None) => return Some(iter),
-            (None, Some(_)) => return None,
-        }
-        iter = iter_next;
-    }
 }
 
 fn build_file_list(paths: &Vec<&str>) -> Vec<PathBuf> {
@@ -91,10 +71,6 @@ pub fn print(&self) {
         }
         Ok(())
     }
-}
-
-fn path_exists(path : &PathBuf) -> bool {
-    fs::metadata(path).is_ok()
 }
 
 pub fn write_blob(path: &PathBuf, root_dir: &PathBuf) -> io::Result<String> {
