@@ -9,12 +9,12 @@ use std::env;
 
 pub fn add_all(root_dir: &PathBuf, to_add: &Vec<&str>) -> io::Result<()> {
     let mut index = try!(Index::new(&root_dir));
-    let filepaths = build_file_list( &to_add );
+    let filepaths = build_file_list(&to_add);
     for filename in filepaths {
         match write_blob(&filename, &root_dir) {
             Ok(hash) => {
-                let relative_path = relative_from( &filename, root_dir ).unwrap();
-                index.update( &relative_path.to_str().unwrap(), &hash)
+                let relative_path = relative_from(&filename, root_dir).unwrap();
+                index.update(&relative_path.to_str().unwrap(), &hash)
             },
             Err(e) => return Err(e)
         }
@@ -22,16 +22,16 @@ pub fn add_all(root_dir: &PathBuf, to_add: &Vec<&str>) -> io::Result<()> {
     index.write()
 }
 
-fn relative_from<'a, P: Sized + AsRef<Path>>( abs: &'a P, root: &'a P ) -> Option<&'a Path> {
+fn relative_from<'a, P: Sized + AsRef<Path>>(abs: &'a P, root: &'a P) -> Option<&'a Path> {
     // See Path.relative_from(*) which is currently unstable.
     iter_after(abs.as_ref().components(), root.as_ref().components()).map(|c| c.as_path())
 }
-fn iter_after<A, I, J>( mut iter: I, mut prefix: J ) -> Option<I> where
+fn iter_after<A, I, J>(mut iter: I, mut prefix: J) -> Option<I> where
     I: Iterator<Item=A> + Clone, J: Iterator<Item=A>, A: PartialEq 
 {
     loop {
         let mut iter_next = iter.clone();
-        match( iter_next.next(), prefix.next() ){
+        match (iter_next.next(), prefix.next()) {
             (Some(x), Some(y)) => {
                 if x != y { return None }
             },
@@ -43,7 +43,7 @@ fn iter_after<A, I, J>( mut iter: I, mut prefix: J ) -> Option<I> where
     }
 }
 
-fn build_file_list(paths: &Vec<&str> ) -> Vec<PathBuf> {
+fn build_file_list(paths: &Vec<&str>) -> Vec<PathBuf> {
     let cur_dir = env::current_dir().unwrap();
     paths.iter().map(|path| cur_dir.join(path)).collect::<Vec<_>>() 
 }
@@ -62,10 +62,10 @@ impl Index {
         if !path_exists(&*index.path) {
             return Ok(index);
         }
-        let file = BufReader::new( try!(File::open(&*index.path)) );
+        let file = BufReader::new(try!(File::open(&*index.path)));
         for line in file.lines() {
             match line {
-                Ok( l ) => {
+                Ok(l) => {
                     let blob : Vec<&str> = l.split(' ').collect();
                     index.update(blob[0], blob[1]);
                 },
