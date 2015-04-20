@@ -58,7 +58,8 @@ impl Index {
     pub fn update(&mut self, path: &str, hash: &str) {
         self.hashes.insert(path.to_string(), hash.to_string());
     }
-pub fn print(&self) {
+
+    pub fn print(&self) {
         for (ref hash, ref path) in self.hashes.iter() {
             println!("{} {}", hash, path);
         }
