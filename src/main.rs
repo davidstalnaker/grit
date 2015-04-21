@@ -16,23 +16,25 @@ fn main() {
                          .required(true)))
         .get_matches();
 
-    if let Some(..) = matches.subcommand_matches("init") {
-        match grit::init() {
-            Ok(()) => println!("Initialized."),
-            Err(..) => println!("Error: already initialized.")
-        }
-    }
-
-    match grit::find_root_dir() {
-        Ok(root_dir) => {
-            if let Some(submatches) = matches.subcommand_matches("add") {
-                match grit::add_all(&root_dir, &submatches.values_of("file").unwrap()) {
-                    Ok(()) => (),
-                    Err(e) => println!("Error: {}", e)
-                }
+    match matches.subcommand() {
+        ("init", Some(..)) => {
+            match grit::init() {
+                Ok(()) => println!("Initialized."),
+                Err(..) => println!("Error: already initialized.")
             }
         },
-        Err(msg) => { println!("{}", msg); }
+        ("add", Some(submatches)) => {
+            match grit::find_root_dir() {
+                Ok(root_dir) => {
+                    match grit::add_all(&root_dir, &submatches.values_of("file").unwrap()) {
+                        Ok(()) => (),
+                        Err(e) => println!("Error: {}", e)
+                    }
+                },
+                Err(msg) => { println!("{}", msg); }
+            }
+        }
+        _ => println!("Command not recognized.")
     }
 }
 
