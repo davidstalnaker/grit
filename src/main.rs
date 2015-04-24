@@ -24,14 +24,9 @@ fn main() {
             }
         },
         ("add", Some(submatches)) => {
-            match grit::find_root_dir() {
-                Ok(root_dir) => {
-                    match grit::add_all(&root_dir, &submatches.values_of("file").unwrap()) {
-                        Ok(()) => (),
-                        Err(e) => println!("Error: {}", e)
-                    }
-                },
-                Err(msg) => { println!("{}", msg); }
+            match grit::add_all(&submatches.values_of("file").unwrap()) {
+                Ok(()) => (),
+                Err(e) => println!("Error: {}", e)
             }
         }
         _ => println!("Command not recognized.")

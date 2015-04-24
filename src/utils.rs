@@ -2,14 +2,16 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub fn find_root_dir() -> Result<PathBuf, String> {
+use errors::GritError;
+
+pub fn find_root_dir() -> Result<PathBuf, GritError> {
     let mut cur_dir = env::current_dir().unwrap();
     loop {
         if is_grit_dir(&cur_dir) {
             return Ok(cur_dir)
         }
         if !cur_dir.pop() {
-            return Err("No grit directory found.".to_string());
+            return Err(GritError::NoGritDir);
         }
     }
 }
