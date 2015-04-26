@@ -14,6 +14,8 @@ fn main() {
                          .index(1)
                          .multiple(true)
                          .required(true)))
+        .subcommand(SubCommand::new("commit")
+                    .about("Commits a change."))
         .get_matches();
 
     match matches.subcommand() {
@@ -25,6 +27,12 @@ fn main() {
         },
         ("add", Some(submatches)) => {
             match grit::add_all(&submatches.values_of("file").unwrap()) {
+                Ok(()) => (),
+                Err(e) => println!("Error: {}", e)
+            }
+        }
+        ("commit", Some(..)) => {
+            match grit::commit() {
                 Ok(()) => (),
                 Err(e) => println!("Error: {}", e)
             }
