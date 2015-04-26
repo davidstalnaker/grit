@@ -16,8 +16,8 @@ pub fn find_root_dir() -> Result<PathBuf, GritError> {
     }
 }
 
-pub fn is_grit_dir(path: &PathBuf) -> bool {
-    path_exists(&path.join(".grit"))
+pub fn is_grit_dir<P>(path: P) -> bool where P: Sized + AsRef<Path> {
+    path_exists(path.as_ref().join(".grit"))
 }
 
 // These are reimplementations of unstable rust features so we can use them.
@@ -44,7 +44,7 @@ fn iter_after<A, I, J>(mut iter: I, mut prefix: J) -> Option<I> where
     }
 }
 
-pub fn path_exists(path: &PathBuf) -> bool {
+pub fn path_exists<P>(path: P) -> bool where P: Sized + AsRef<Path> {
     fs::metadata(path).is_ok()
 }
 

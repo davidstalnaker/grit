@@ -7,20 +7,20 @@ use std::path::{PathBuf};
 use utils::path_exists;
 
 pub struct Index {
-    path: Box<PathBuf>,
+    path: PathBuf,
     hashes: HashMap<String, String>
 }
 
 impl Index {
     pub fn new(root_dir: &PathBuf) -> io::Result<Index> {
         let mut index = Index {
-            path: Box::new(root_dir.join(".grit").join("index")),
+            path: root_dir.join(".grit").join("index"),
             hashes: HashMap::new()
         };
-        if !path_exists(&*index.path) {
+        if !path_exists(&index.path) {
             return Ok(index);
         }
-        let file = BufReader::new(try!(File::open(&*index.path)));
+        let file = BufReader::new(try!(File::open(&index.path)));
         for line in file.lines() {
             match line {
                 Ok(l) => {
@@ -44,7 +44,7 @@ impl Index {
     }
 
     pub fn write(&self) -> io::Result<()> {
-        let mut index = try!(File::create(&*self.path));
+        let mut index = try!(File::create(&self.path));
         for (ref hash, ref path) in self.hashes.iter() {
             try!(writeln!(&mut index, "{} {}", hash, path));
         }
