@@ -13,7 +13,7 @@ pub fn add_all(to_add: &Vec<&str>) -> Result<(), GritError> {
     let mut index = try!(Index::new(&root_dir));
     let filepaths = build_file_list(&to_add);
     for filename in filepaths {
-        let blob = try!(Blob::from_path(&filename));
+        let mut blob = try!(Blob::from_path(&filename));
         try!(blob.write(&root_dir));
         let relative_path = relative_from(&filename, &root_dir).unwrap();
         index.update(&relative_path.to_str().unwrap(), &blob.hash)
