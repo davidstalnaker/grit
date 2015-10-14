@@ -5,16 +5,16 @@ use clap::{App, Arg, SubCommand};
 
 fn main() {
     let matches = App::new("Grit")
-        .subcommand(SubCommand::new("init")
+        .subcommand(SubCommand::with_name("init")
                     .about("Initializes the repo"))
-        .subcommand(SubCommand::new("add")
+        .subcommand(SubCommand::with_name("add")
                     .about("Adds a file")
-                    .arg(Arg::new("file")
+                    .arg(Arg::with_name("file")
                          .help("File to add")
                          .index(1)
                          .multiple(true)
                          .required(true)))
-        .subcommand(SubCommand::new("commit")
+        .subcommand(SubCommand::with_name("commit")
                     .about("Commits a change."))
         .get_matches();
 

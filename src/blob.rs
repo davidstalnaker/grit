@@ -1,9 +1,11 @@
-extern crate sha1;
+extern crate crypto;
 
 use std::{io, fs};
 use std::io::{Read, Write};
 use std::fs::File;
 use std::path::PathBuf;
+use self::crypto::sha1::Sha1;
+use self::crypto::digest::Digest;
 
 use utils::path_exists;
 
@@ -18,10 +20,10 @@ impl Blob {
         let mut bytes = Vec::new();
         try!(f.read_to_end(&mut bytes));
 
-        let mut sha = sha1::Sha1::new();
-        sha.update(&bytes);
+        let mut sha = Sha1::new();
+        sha.input(&bytes);
         Ok(Blob {
-            hash: sha.hexdigest(),
+            hash: sha.result_str(),
             data: bytes
         })
     }
