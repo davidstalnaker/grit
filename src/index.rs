@@ -4,13 +4,15 @@ use std::io::{BufReader, BufRead, Write};
 use std::fs::File;
 use std::path::{PathBuf};
 
+use errors::GritError;
+
 pub struct Index {
     path: PathBuf,
     hashes: HashMap<String, String>
 }
 
 impl Index {
-    pub fn new(root_dir: &PathBuf) -> io::Result<Index> {
+    pub fn new(root_dir: &PathBuf) -> Result<Index, GritError> {
         let mut index = Index {
             path: root_dir.join(".grit").join("index"),
             hashes: HashMap::new()
@@ -22,6 +24,9 @@ impl Index {
         for line in file.lines() {
             let l = line?;
             let blob : Vec<&str> = l.split(' ').collect();
+            if blob.len() != 2 {
+                return Err(GritError::InvalidIndexFile);
+            }
             index.update(blob[0], blob[1]);
         }
         Ok(index)
