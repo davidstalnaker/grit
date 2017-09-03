@@ -4,5 +4,5 @@ version = "0.0.1"
 authors = ["David Stalnaker <david.stalnaker@gmail.com>"]
 
 [dependencies]
-clap = "1.4.5"
+clap = "2.26.0"
 rust-crypto = "0.2.31"

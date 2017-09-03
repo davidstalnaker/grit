@@ -26,7 +26,7 @@ fn main() {
             }
         },
         ("add", Some(submatches)) => {
-            match grit::add_all(&submatches.values_of("file").unwrap()) {
+            match grit::add_all(&submatches.values_of("file").unwrap().collect()) {
                 Ok(()) => (),
                 Err(e) => println!("Error: {}", e)
             }
