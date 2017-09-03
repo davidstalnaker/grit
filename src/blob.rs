@@ -29,11 +29,11 @@ impl Blob {
     pub fn write(&self, root_dir: &PathBuf) -> io::Result<()> {
         let objects = root_dir.join(".grit").join("objects");
         let blob_dir = objects.join(&self.hash[..2]);
-        if blob_dir.exists() {
+        if !blob_dir.exists() {
             fs::create_dir(&blob_dir)?;
         }
         let blob = blob_dir.join(&self.hash[2..]);
-        if blob.exists() {
+        if !blob.exists() {
             let mut blob_f = File::create(&blob)?;
             blob_f.write_all(&self.data)?;
         }
