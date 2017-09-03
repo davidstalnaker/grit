@@ -1,5 +1,5 @@
 //use std::path::Path;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 //use blob::Blob;
 use errors::GritError;
@@ -8,7 +8,7 @@ use index::Index;
 pub struct Commit {
     pub hash: Option<String>,
     pub parent: Option<String>,
-    pub files: HashMap<String, String>,
+    pub files: BTreeMap<String, String>,
 }
 
 impl Commit {
@@ -16,7 +16,7 @@ impl Commit {
         let commit = Commit {
             hash: None,
             parent: parent.map(|p| p.to_string()),
-            files: HashMap::new()
+            files: BTreeMap::new()
         };
         Ok(commit)
     }

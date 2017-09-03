@@ -1,5 +1,5 @@
 use std::io;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::io::{BufReader, BufRead, Write};
 use std::fs::File;
 use std::path::{PathBuf};
@@ -8,14 +8,14 @@ use errors::GritError;
 
 pub struct Index {
     pub path: PathBuf,
-    pub hashes: HashMap<String, String>
+    pub hashes: BTreeMap<String, String>
 }
 
 impl Index {
     pub fn new(root_dir: &PathBuf) -> Result<Index, GritError> {
         let mut index = Index {
             path: root_dir.join(".grit").join("index"),
-            hashes: HashMap::new()
+            hashes: BTreeMap::new()
         };
         if !index.path.exists() {
             return Ok(index);
