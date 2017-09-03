@@ -1,23 +1,23 @@
 use std::path::{PathBuf};
 use std::env;
 
-use utils::{find_root_dir, relative_from};
+use utils::{find_root_dir};
 use blob::Blob;
 use index::Index;
 use errors::GritError;
 
 
 pub fn add_all(to_add: &Vec<&str>) -> Result<(), GritError> {
-    let root_dir = try!(find_root_dir());
-    let mut index = try!(Index::new(&root_dir));
+    let root_dir = find_root_dir()?;
+    let mut index = Index::new(&root_dir)?;
     let filepaths = build_file_list(&to_add);
     for filename in filepaths {
-        let blob = try!(Blob::from_path(&filename));
-        try!(blob.write(&root_dir));
-        let relative_path = relative_from(&filename, &root_dir).unwrap();
+        let blob = Blob::from_path(&filename)?;
+        blob.write(&root_dir)?;
+        let relative_path = filename.strip_prefix(&root_dir).unwrap();
         index.update(&relative_path.to_str().unwrap(), &blob.hash)
     }
-    try!(index.write());
+    index.write()?;
     Ok(())
 }
 

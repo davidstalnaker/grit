@@ -4,8 +4,6 @@ use std::io::{BufReader, BufRead, Write};
 use std::fs::File;
 use std::path::{PathBuf};
 
-use utils::path_exists;
-
 pub struct Index {
     path: PathBuf,
     hashes: HashMap<String, String>
@@ -17,18 +15,14 @@ impl Index {
             path: root_dir.join(".grit").join("index"),
             hashes: HashMap::new()
         };
-        if !path_exists(&index.path) {
+        if !index.path.exists() {
             return Ok(index);
         }
-        let file = BufReader::new(try!(File::open(&index.path)));
+        let file = BufReader::new(File::open(&index.path)?);
         for line in file.lines() {
-            match line {
-                Ok(l) => {
-                    let blob : Vec<&str> = l.split(' ').collect();
-                    index.update(blob[0], blob[1]);
-                },
-                Err(e) => println!("Error: {}",e)
-            }
+            let l = line?;
+            let blob : Vec<&str> = l.split(' ').collect();
+            index.update(blob[0], blob[1]);
         }
         Ok(index)
     }
@@ -44,9 +38,9 @@ impl Index {
     }
 
     pub fn write(&self) -> io::Result<()> {
-        let mut index = try!(File::create(&self.path));
+        let mut index = File::create(&self.path)?;
         for (ref hash, ref path) in self.hashes.iter() {
-            try!(writeln!(&mut index, "{} {}", hash, path));
+            writeln!(&mut index, "{} {}", hash, path)?;
         }
         Ok(())
     }
