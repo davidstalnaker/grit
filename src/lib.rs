@@ -7,6 +7,7 @@ pub use self::errors::GritError;
 pub mod add;
 pub mod init;
 pub mod commit;
+pub mod commit_object;
 pub mod blob;
 pub mod index;
 pub mod tree;

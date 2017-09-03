@@ -7,8 +7,8 @@ use std::path::{PathBuf};
 use errors::GritError;
 
 pub struct Index {
-    path: PathBuf,
-    hashes: HashMap<String, String>
+    pub path: PathBuf,
+    pub hashes: HashMap<String, String>
 }
 
 impl Index {
