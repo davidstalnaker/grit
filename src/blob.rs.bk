@@ -9,7 +9,7 @@ use self::crypto::digest::Digest;
 
 pub struct Blob {
     pub hash: String,
-    pub data: Vec<u8>,
+    pub data: Vec<u8>
 }
 
 impl Blob {
@@ -22,7 +22,7 @@ impl Blob {
         sha.input(&bytes);
         Ok(Blob {
             hash: sha.result_str(),
-            data: bytes,
+            data: bytes
         })
     }
 
@@ -41,3 +41,4 @@ impl Blob {
         Ok(())
     }
 }
+

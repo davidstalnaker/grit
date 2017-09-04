@@ -12,7 +12,7 @@ impl fmt::Display for GritError {
         return formatter.write_str(match self {
             &GritError::IoError => "An IO error occured",
             &GritError::NoGritDir => "No grit directory found.",
-            &GritError::InvalidIndexFile => "The index is corrupt.",
+            &GritError::InvalidIndexFile => "The index is corrupt."
         });
     }
 }

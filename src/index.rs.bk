@@ -2,20 +2,20 @@ use std::io;
 use std::collections::BTreeMap;
 use std::io::{BufReader, BufRead, Write};
 use std::fs::File;
-use std::path::PathBuf;
+use std::path::{PathBuf};
 
 use errors::GritError;
 
 pub struct Index {
     pub path: PathBuf,
-    pub hashes: BTreeMap<String, String>,
+    pub hashes: BTreeMap<String, String>
 }
 
 impl Index {
     pub fn new(root_dir: &PathBuf) -> Result<Index, GritError> {
         let mut index = Index {
             path: root_dir.join(".grit").join("index"),
-            hashes: BTreeMap::new(),
+            hashes: BTreeMap::new()
         };
         if !index.path.exists() {
             return Ok(index);
@@ -23,7 +23,7 @@ impl Index {
         let file = BufReader::new(File::open(&index.path)?);
         for line in file.lines() {
             let l = line?;
-            let blob: Vec<&str> = l.split(' ').collect();
+            let blob : Vec<&str> = l.split(' ').collect();
             if blob.len() != 2 {
                 return Err(GritError::InvalidIndexFile);
             }
@@ -50,3 +50,4 @@ impl Index {
         Ok(())
     }
 }
+

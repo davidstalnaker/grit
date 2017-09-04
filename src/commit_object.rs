@@ -9,7 +9,6 @@ use std::io::Write;
 use self::crypto::sha1::Sha1;
 use self::crypto::digest::Digest;
 
-//use blob::Blob;
 use errors::GritError;
 use index::Index;
 
@@ -24,7 +23,7 @@ impl Commit {
         let commit = Commit {
             hash: None,
             parent: parent.map(|p| p.to_string()),
-            files: BTreeMap::new()
+            files: BTreeMap::new(),
         };
         Ok(commit)
     }

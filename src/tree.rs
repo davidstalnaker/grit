@@ -1,13 +1,9 @@
 
 pub enum Tree {
-    BlobEntry {
-        name: String,
-        hash: String
-    },
+    BlobEntry { name: String, hash: String },
     TreeEntry {
         name: String,
         hash: String,
-        children: Vec<Tree>
-    }
+        children: Vec<Tree>,
+    },
 }
-
