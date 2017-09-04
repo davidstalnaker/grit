@@ -40,7 +40,7 @@ impl Commit {
         }
     }
 
-    pub fn write(&self, root_dir: &PathBuf) -> io::Result<()> {
+    pub fn write(&mut self, root_dir: &PathBuf) -> io::Result<()> {
         let mut bytes = Vec::new();
         if let Some(ref p) = self.parent {
             writeln!(&mut bytes, "parent {}", p)?;
@@ -63,6 +63,9 @@ impl Commit {
             let mut blob_f = File::create(&blob)?;
             blob_f.write_all(&bytes)?;
         }
+
+        let mut ref_f = File::create(root_dir.join(".grit").join("refs/heads/master"))?;
+        writeln!(ref_f, "{}", &hash)?;
 
         Ok(())
     }
