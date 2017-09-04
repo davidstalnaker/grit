@@ -1,5 +1,13 @@
-//use std::path::Path;
+extern crate crypto;
+
+use std::io;
+use std::fs;
+use std::fs::File;
+use std::path::PathBuf;
 use std::collections::BTreeMap;
+use std::io::Write;
+use self::crypto::sha1::Sha1;
+use self::crypto::digest::Digest;
 
 //use blob::Blob;
 use errors::GritError;
@@ -31,5 +39,32 @@ impl Commit {
         for (ref hash, ref path) in self.files.iter() {
             println!("{} {}", hash, path);
         }
+    }
+
+    pub fn write(&self, root_dir: &PathBuf) -> io::Result<()> {
+        let mut bytes = Vec::new();
+        if let Some(ref p) = self.parent {
+            writeln!(&mut bytes, "parent {}", p)?;
+        }
+        for (ref hash, ref path) in self.files.iter() {
+            writeln!(&mut bytes, "blob {} {}", hash, path)?;
+        }
+
+        let mut sha = Sha1::new();
+        sha.input(&bytes);
+        let hash = sha.result_str();
+
+        let objects = root_dir.join(".grit").join("objects");
+        let blob_dir = objects.join(&hash[..2]);
+        if !blob_dir.exists() {
+            fs::create_dir(&blob_dir)?;
+        }
+        let blob = blob_dir.join(&hash[2..]);
+        if !blob.exists() {
+            let mut blob_f = File::create(&blob)?;
+            blob_f.write_all(&bytes)?;
+        }
+
+        Ok(())
     }
 }

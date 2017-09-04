@@ -8,6 +8,6 @@ pub fn commit() -> Result<(), GritError> {
     let index = Index::new(&root_dir)?;
     let mut commit = Commit::new(None)?;
     commit.add_from_index(&index);
-    commit.print();
+    commit.write(&root_dir)?;
     Ok(())
 }
