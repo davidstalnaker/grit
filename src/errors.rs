@@ -2,23 +2,23 @@ use std::fmt;
 use std::io;
 
 pub enum GritError {
-    IoError,
+    IoError(io::Error),
     NoGritDir,
     InvalidIndexFile,
 }
 
 impl fmt::Display for GritError {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        return formatter.write_str(match self {
-            &GritError::IoError => "An IO error occured",
-            &GritError::NoGritDir => "No grit directory found.",
-            &GritError::InvalidIndexFile => "The index is corrupt.",
-        });
+        match self {
+            &GritError::IoError(ref inner) => inner.fmt(formatter),
+            &GritError::NoGritDir => formatter.write_str("No grit directory found."),
+            &GritError::InvalidIndexFile => formatter.write_str("The index is corrupt."),
+        }
     }
 }
 
 impl From<io::Error> for GritError {
-    fn from(_: io::Error) -> GritError {
-        GritError::IoError
+    fn from(err: io::Error) -> GritError {
+        GritError::IoError(err)
     }
 }
