@@ -49,4 +49,9 @@ impl Index {
         }
         Ok(())
     }
+
+    pub fn clear(&mut self) -> io::Result<()> {
+        self.hashes = BTreeMap::new();
+        self.write()
+    }
 }
