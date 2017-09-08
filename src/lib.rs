@@ -12,4 +12,4 @@ pub mod blob;
 pub mod index;
 pub mod tree;
 pub mod errors;
-mod utils;
+pub mod file_service;
