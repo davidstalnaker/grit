@@ -5,6 +5,7 @@ pub enum GritError {
     IoError(io::Error),
     NoGritDir,
     InvalidIndexFile,
+    InvalidCommitFile,
 }
 
 impl fmt::Display for GritError {
@@ -13,6 +14,7 @@ impl fmt::Display for GritError {
             &GritError::IoError(ref inner) => inner.fmt(formatter),
             &GritError::NoGritDir => formatter.write_str("No grit directory found."),
             &GritError::InvalidIndexFile => formatter.write_str("The index is corrupt."),
+            &GritError::InvalidCommitFile => formatter.write_str("A commit file is invalid."),
         }
     }
 }

@@ -69,6 +69,10 @@ impl FileService {
         self.write_object(&blob.hash, &blob.data)
     }
 
+    pub fn read_commit(&self, hash: &str) -> Result<Commit, GritError> {
+        Commit::from_string(hash, &self.read_object(hash)?)
+    }
+
     pub fn write_commit(&self, commit: &mut Commit) -> io::Result<()> {
         commit.update();
 
@@ -87,6 +91,14 @@ impl FileService {
         }
 
         Ok(())
+    }
+
+    pub fn read_object(&self, hash: &str) -> io::Result<String> {
+        let mut data = String::new();
+        let object_filename = self.object_dir.join(&hash[..2]).join(&hash[2..]);
+        let mut object_f = File::open(&object_filename)?;
+        object_f.read_to_string(&mut data)?;
+        Ok(data)
     }
 
     pub fn write_object(&self, hash: &str, data: &Vec<u8>) -> io::Result<()> {

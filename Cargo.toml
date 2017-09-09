@@ -6,3 +6,5 @@ authors = ["David Stalnaker <david.stalnaker@gmail.com>"]
 [dependencies]
 clap = "2.26.0"
 rust-crypto = "0.2.31"
+regex = "0.2"
+lazy_static = "0.2.8"

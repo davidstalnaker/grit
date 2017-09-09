@@ -27,7 +27,7 @@ impl Index {
             if blob.len() != 2 {
                 return Err(GritError::InvalidIndexFile);
             }
-            index.update(blob[0], blob[1]);
+            index.update(blob[1], blob[0]);
         }
         Ok(index)
     }

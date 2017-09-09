@@ -1,3 +1,5 @@
+#[macro_use] extern crate lazy_static;
+
 pub use self::add::add_all;
 pub use self::init::init;
 pub use self::commit::commit;
