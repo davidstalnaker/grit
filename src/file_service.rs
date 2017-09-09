@@ -1,7 +1,7 @@
 use std::env;
 use std::path::{Path, PathBuf};
 use std::fs::File;
-use std::io::{Read,Write};
+use std::io::{Read, Write};
 use std::io;
 use std::fs;
 
@@ -50,7 +50,7 @@ impl FileService {
         let mut head_file = File::open(self.root_dir.join(".grit/HEAD"))?;
         let mut ref_path = String::new();
         head_file.read_to_string(&mut ref_path)?;
-        
+
         Ok(self.grit_dir.join(ref_path))
     }
 
@@ -60,8 +60,8 @@ impl FileService {
                 let mut hash = String::new();
                 f.read_to_string(&mut hash).unwrap();
                 Some(hash)
-            },
-            Err(_) => None
+            }
+            Err(_) => None,
         }
     }
 
@@ -82,8 +82,8 @@ impl FileService {
                 let head = self.get_head_ref()?;
                 let mut head_f = File::create(&head)?;
                 head_f.write_all(hash.as_bytes())?;
-            },
-            _ => { panic!("Commit.update() should have set hash and data.") }
+            }
+            _ => panic!("Commit.update() should have set hash and data."),
         }
 
         Ok(())
