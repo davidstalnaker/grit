@@ -14,7 +14,7 @@ pub fn add_all(to_add: &Vec<&str>) -> Result<(), GritError> {
     for filename in to_add {
         let full_path = cur_dir.join(filename);
         let blob = Blob::from_path(&full_path)?;
-        blob.write(&file_service.root_dir)?;
+        file_service.write_blob(&blob)?;
         let relative_path = full_path.strip_prefix(&file_service.root_dir).unwrap();
         index.update(&relative_path.to_str().unwrap(), &blob.hash)
     }

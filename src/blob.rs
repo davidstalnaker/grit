@@ -1,7 +1,7 @@
 extern crate crypto;
 
-use std::{io, fs};
-use std::io::{Read, Write};
+use std::io;
+use std::io::Read;
 use std::fs::File;
 use std::path::PathBuf;
 use self::crypto::sha1::Sha1;
@@ -24,20 +24,5 @@ impl Blob {
             hash: sha.result_str(),
             data: bytes,
         })
-    }
-
-    pub fn write(&self, root_dir: &PathBuf) -> io::Result<()> {
-        let objects = root_dir.join(".grit").join("objects");
-        let blob_dir = objects.join(&self.hash[..2]);
-        if !blob_dir.exists() {
-            fs::create_dir(&blob_dir)?;
-        }
-        let blob = blob_dir.join(&self.hash[2..]);
-        if !blob.exists() {
-            let mut blob_f = File::create(&blob)?;
-            blob_f.write_all(&self.data)?;
-        }
-
-        Ok(())
     }
 }

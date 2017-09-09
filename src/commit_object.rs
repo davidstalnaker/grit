@@ -1,9 +1,5 @@
 extern crate crypto;
 
-use std::io;
-use std::fs;
-use std::fs::File;
-use std::path::PathBuf;
 use std::collections::BTreeMap;
 use std::io::Write;
 use self::crypto::sha1::Sha1;
@@ -14,6 +10,7 @@ use index::Index;
 
 pub struct Commit {
     pub hash: Option<String>,
+    pub data: Option<Vec<u8>>,
     pub parent: Option<String>,
     pub files: BTreeMap<String, String>,
 }
@@ -22,6 +19,7 @@ impl Commit {
     pub fn new(parent: Option<&str>) -> Result<Commit, GritError> {
         let commit = Commit {
             hash: None,
+            data: None,
             parent: parent.map(|p| p.to_string()),
             files: BTreeMap::new(),
         };
@@ -40,33 +38,18 @@ impl Commit {
         }
     }
 
-    pub fn write(&mut self, root_dir: &PathBuf, head_ref: &PathBuf) -> io::Result<()> {
-        let mut bytes = Vec::new();
+    pub fn update(&mut self) {
+        let mut data = Vec::new();
         if let Some(ref p) = self.parent {
-            writeln!(&mut bytes, "parent {}", p)?;
+            writeln!(&mut data, "parent {}", p).unwrap();
         }
         for (ref hash, ref path) in self.files.iter() {
-            writeln!(&mut bytes, "blob {} {}", hash, path)?;
+            writeln!(&mut data, "blob {} {}", hash, path).unwrap();
         }
 
         let mut sha = Sha1::new();
-        sha.input(&bytes);
-        let hash = sha.result_str();
-
-        let objects = root_dir.join(".grit").join("objects");
-        let blob_dir = objects.join(&hash[..2]);
-        if !blob_dir.exists() {
-            fs::create_dir(&blob_dir)?;
-        }
-        let blob = blob_dir.join(&hash[2..]);
-        if !blob.exists() {
-            let mut blob_f = File::create(&blob)?;
-            blob_f.write_all(&bytes)?;
-        }
-
-        let mut ref_f = File::create(head_ref)?;
-        writeln!(ref_f, "{}", &hash)?;
-
-        Ok(())
+        sha.input(&data);
+        self.hash = Some(sha.result_str());
+        self.data = Some(data);
     }
 }
